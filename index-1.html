@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AL-NOOR ISLAMIC INSTITUTE - Student Management</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --green:#063b2b;--green2:#0b5d43;--green3:#13835e;
+  --light:#eef7f2;--gold:#d5ad52;--danger:#b42318;
+  --text:#17352a;--muted:#64756d;--white:#fff;--border:#d9e5df;
+  --shadow:0 10px 30px rgba(0,45,32,.10)
+}
+body{margin:0;font-family:"Noto Nastaliq Urdu","Jameel Noori Nastaleeq",Tahoma,Arial,sans-serif;background:#f4f8f6;color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.top{
+  background:linear-gradient(135deg,#032c20,#086044 55%,#0d7957);
+  color:white;padding:22px 16px;text-align:center;border-bottom:4px solid var(--gold)
+}
+.top h1{margin:0;font-family:Arial,sans-serif;font-size:clamp(20px,4vw,34px);letter-spacing:1px}
+.top h2{margin:8px 0 2px;font-size:clamp(20px,4vw,30px)}
+.top p{margin:4px 0 0;font-family:Arial,sans-serif;opacity:.9}
+.nav{
+  background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.08);
+  display:flex;justify-content:center;gap:8px;padding:10px;position:sticky;top:0;z-index:20
+}
+.nav button{border:0;background:transparent;color:var(--green);padding:9px 14px;border-radius:9px}
+.nav button:hover,.nav button.active{background:var(--green);color:#fff}
+.container{max-width:1200px;margin:auto;padding:18px}
+.section{display:none}.section.active{display:block}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+.section-title h2{margin:0;color:var(--green)}
+.btn{
+  border:0;border-radius:9px;padding:10px 15px;background:var(--green);color:#fff;
+  box-shadow:0 4px 10px rgba(6,59,43,.14)
+}
+.btn:hover{background:var(--green2)}
+.btn.secondary{background:#e7f1ed;color:var(--green)}
+.btn.danger{background:var(--danger)}
+.btn.gold{background:#b58a29}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.card{
+  background:#fff;border:1px solid var(--border);border-radius:15px;padding:20px;
+  box-shadow:var(--shadow);cursor:pointer;transition:.2s
+}
+.card:hover{transform:translateY(-3px)}
+.card .icon{font-size:28px}
+.card h3{margin:8px 0;color:var(--green)}
+.count{font:bold 32px Arial;color:var(--green3)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:15px;padding:18px;box-shadow:var(--shadow)}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.field label{display:block;font-weight:bold;margin-bottom:6px}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid #cbd9d3;border-radius:8px;padding:11px;
+  outline:none;background:#fff
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green3);box-shadow:0 0 0 3px rgba(19,131,94,.1)}
+.field.full{grid-column:1/-1}
+textarea{min-height:90px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.searchbox{display:flex;gap:8px;margin-bottom:15px}
+.searchbox input{flex:1;border:1px solid var(--border);border-radius:9px;padding:12px}
+.list{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.student{
+  background:#fff;border:1px solid var(--border);border-radius:13px;padding:15px;
+  box-shadow:0 5px 18px rgba(0,45,32,.07)
+}
+.student h3{margin:0 0 7px;color:var(--green);font-size:20px}
+.student .meta{color:var(--muted);line-height:1.9}
+.student .student-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.student .student-actions button{border:0;border-radius:7px;padding:7px 10px;background:#e8f2ee;color:var(--green)}
+.student .student-actions .del{background:#fde9e7;color:var(--danger)}
+.student .student-actions .wa{background:#e7f7ec;color:#08783e}
+.badge{display:inline-block;background:#e8f2ee;color:var(--green);padding:3px 8px;border-radius:20px;font-size:13px}
+.empty{text-align:center;padding:35px;color:var(--muted);background:#fff;border:1px dashed var(--border);border-radius:12px}
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;
+  align-items:center;justify-content:center;padding:15px
+}
+.modal.show{display:flex}
+.modal-box{background:#fff;width:min(850px,100%);max-height:92vh;overflow:auto;border-radius:16px;padding:20px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:15px}
+.close{border:0;background:#eee;border-radius:50%;width:35px;height:35px;font-size:20px}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.detail{background:#f7faf8;border-radius:9px;padding:10px}
+.detail strong{display:block;color:var(--green);margin-bottom:3px}
+.notice{background:#fff9e8;border:1px solid #ead7a0;color:#72570c;padding:10px;border-radius:9px;margin-bottom:15px}
+.toast{
+  position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);
+  background:#063b2b;color:#fff;padding:11px 18px;border-radius:9px;opacity:0;pointer-events:none;
+  transition:.25s;z-index:100
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.footer{text-align:center;color:var(--muted);padding:25px}
+#searchResults{margin-top:12px}
+@media(max-width:800px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .list{grid-template-columns:1fr}
+  .form-grid,.detail-grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+}
+@media(max-width:500px){
+  .container{padding:12px}
+  .nav{overflow-x:auto;justify-content:flex-start}
+  .nav button{white-space:nowrap}
+  .cards{gap:9px}.card{padding:13px}.count{font-size:26px}
+  .student-actions button{flex:1}
+}
+@media print{
+  body{background:#fff}
+  .top,.nav,.actions,.section-title .btn,.student-actions,.footer,#searchSection{display:none!important}
+  .section{display:none!important}
+  #recordsSection{display:block!important}
+  .container{max-width:none;padding:0}
+  .panel{box-shadow:none;border:0}
+  .student{break-inside:avoid;box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>AL-NOOR ISLAMIC INSTITUTE</h1>
+  <h2>نظامِ طلبہ و ریکارڈ مینجمنٹ</h2>
+  <p>Student Management &amp; Record System</p>
+</header>
+
+<nav class="nav">
+  <button id="navDashboard" class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button id="navSearch" onclick="showSection('search')">سرچ</button>
+  <button id="navRecords" onclick="showSection('records')">Student Record</button>
+</nav>
+
+<main class="container">
+
+<section id="dashboardSection" class="section active">
+  <div class="section-title">
+    <h2>ڈیش بورڈ</h2>
+    <button class="btn" onclick="openAddStudent()">+ نیا طالب علم</button>
+  </div>
+  <div class="cards">
+    <div class="card" onclick="openCategory('ناظرہ')">
+      <div class="icon">📖</div><h3>ناظرہ کے طلباء</h3><div class="count" id="nazraCount">0</div>
+    </div>
+    <div class="card" onclick="openCategory('حفظ')">
+      <div class="icon">📚</div><h3>حفظ کے طلباء</h3><div class="count" id="hifzCount">0</div>
+    </div>
+    <div class="card" onclick="openCategory('درس نظامی')">
+      <div class="icon">🕌</div><h3>درس نظامی کے طلباء</h3><div class="count" id="darsCount">0</div>
+    </div>
+    <div class="card" onclick="openCategory('all')">
+      <div class="icon">👥</div><h3>کل طلباء</h3><div class="count" id="totalCount">0</div>
+    </div>
+  </div>
+</section>
+
+<section id="searchSection" class="section">
+  <div class="section-title"><h2>طلبہ کی سرچ</h2></div>
+  <div class="panel">
+    <div class="searchbox">
+      <input id="searchInput" type="search" placeholder="نام، والد کا نام، فون، کلاس، شعبہ یا پتہ لکھیں..." oninput="runSearch()">
+      <button class="btn" onclick="runSearch()">سرچ</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+</section>
+
+<section id="recordsSection" class="section">
+  <div class="section-title">
+    <h2 id="recordsTitle">تمام طلباء</h2>
+    <button class="btn" onclick="openAddStudent(currentCategory==='all'?'':currentCategory)">+ نیا طالب علم</button>
+  </div>
+  <div class="panel">
+    <div id="studentList" class="list"></div>
+  </div>
+</section>
+
+<section id="formSection" class="section">
+  <div class="section-title"><h2 id="formTitle">نیا طالب علم شامل کریں</h2></div>
+  <div class="panel">
+    <div class="notice">تمام ضروری معلومات درج کرنے کے بعد <b>محفوظ کریں</b> پر کلک کریں۔ محفوظ شدہ ریکارڈ اسی ڈیوائس کے براؤزر میں برقرار رہے گا۔</div>
+    <form id="studentForm">
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="field"><label>طالب علم کا نام *</label><input id="name" required></div>
+        <div class="field"><label>والد کا نام *</label><input id="fatherName" required></div>
+        <div class="field"><label>والد/سرپرست کا موبائل نمبر</label><input id="guardianPhone" type="tel" placeholder="03XXXXXXXXX"></div>
+        <div class="field"><label>طالب علم کا موبائل نمبر</label><input id="studentPhone" type="tel"></div>
+        <div class="field"><label>تاریخ پیدائش</label><input id="dob" type="date"></div>
+        <div class="field"><label>مدرسے میں داخلے کی تاریخ</label><input id="admissionDate" type="date"></div>
+        <div class="field"><label>درجہ / کلاس</label><input id="className"></div>
+        <div class="field">
+          <label>شعبہ *</label>
+          <select id="department" required>
+            <option value="">شعبہ منتخب کریں</option>
+            <option value="ناظرہ">ناظرہ</option>
+            <option value="حفظ">حفظ</option>
+            <option value="درس نظامی">درس نظامی</option>
+          </select>
+        </div>
+        <div class="field full"><label>مکمل پتہ</label><textarea id="address"></textarea></div>
+        <div class="field"><label>سابقہ مدرسہ / اسکول</label><input id="previousInstitute"></div>
+        <div class="field"><label>سرپرست کا پیشہ</label><input id="guardianProfession"></div>
+        <div class="field full"><label>اضافی معلومات / نوٹ</label><textarea id="notes"></textarea></div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit">💾 محفوظ کریں</button>
+        <button class="btn secondary" type="button" onclick="cancelForm()">واپس</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<div id="detailModal" class="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="detailTitle">طالب علم کی معلومات</h2><button class="close" onclick="closeModal()">×</button></div>
+    <div id="detailContent"></div>
+    <div class="actions">
+      <button class="btn" id="detailEdit">ترمیم</button>
+      <button class="btn secondary" onclick="window.print()">🖨 پرنٹ / PDF</button>
+      <button class="btn" id="detailWhatsApp">WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<footer class="footer">AL-NOOR ISLAMIC INSTITUTE — Student Management System</footer>
+
+<script>
+const STORAGE_KEY = "alnoorStudents";
+let students = [];
+let currentCategory = "all";
+let editingId = null;
+
+const initialStudents = [
+  {name:"محمد معیز",fatherName:"حمیم خان",department:"ناظرہ"},
+  {name:"محمد ذوالقرنین",fatherName:"فروز الدین",department:"ناظرہ"},
+  {name:"مبشر حسین",fatherName:"نصیر حسین",department:"ناظرہ"},
+  {name:"مزمل حسین",fatherName:"عبدالوحید",department:"ناظرہ"},
+  {name:"محمد حمزہ",fatherName:"عبدالوحید",department:"حفظ"},
+  {name:"محمد آل آمین",fatherName:"محمد سورج",department:"حفظ"},
+  {name:"محمد نعیم",fatherName:"محمد یامین",department:"حفظ"},
+  {name:"محمد احمد",fatherName:"عبدالکریم",department:"حفظ"},
+  {name:"غلام مصطفیٰ",fatherName:"علی حسن",department:"حفظ"},
+  {name:"محمد مدید",fatherName:"شبیر",department:"حفظ"},
+  {name:"شایان",fatherName:"نصیر الدین",department:"درس نظامی"},
+  {name:"محمد حسین",fatherName:"محمد پنھل",department:"درس نظامی"},
+  {name:"نعمان رانا",fatherName:"نطام الدین",department:"درس نظامی"}
+].map((s,i)=>({
+  id:"seed-"+(i+1), guardianPhone:"", studentPhone:"", dob:"", admissionDate:"",
+  className:"", address:"", previousInstitute:"", guardianProfession:"", notes:"", ...s
+}));
+
+function uid(){
+  return "stu-"+Date.now()+"-"+Math.random().toString(36).slice(2,8);
+}
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      if(Array.isArray(parsed)) students=parsed;
+      else students=[...initialStudents];
+    }else{
+      students=[...initialStudents];
+      saveData();
+    }
+  }catch(e){
+    students=[...initialStudents];
+    console.warn("LocalStorage unavailable:",e);
+  }
+  updateCounts();
+}
+function persist(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(students));
+    return true;
+  }catch(e){
+    console.warn("Could not save data:",e);
+    return false;
+  }
+}
+function saveData(){ persist(); }
+
+function updateCounts(){
+  document.getElementById("nazraCount").textContent=students.filter(s=>s.department==="ناظرہ").length;
+  document.getElementById("hifzCount").textContent=students.filter(s=>s.department==="حفظ").length;
+  document.getElementById("darsCount").textContent=students.filter(s=>s.department==="درس نظامی").length;
+  document.getElementById("totalCount").textContent=students.length;
+}
+
+function showSection(name){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(name+"Section").classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(name==="dashboard") document.getElementById("navDashboard").classList.add("active");
+  if(name==="search") document.getElementById("navSearch").classList.add("active");
+  if(name==="records") document.getElementById("navRecords").classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function openCategory(cat){
+  currentCategory=cat;
+  renderStudents();
+  showSection("records");
+}
+function categoryLabel(cat){
+  return cat==="all" ? "تمام طلباء" : cat+" کے طلباء";
+}
+function getFiltered(){
+  return currentCategory==="all" ? students : students.filter(s=>s.department===currentCategory);
+}
+function renderStudents(){
+  document.getElementById("recordsTitle").textContent=categoryLabel(currentCategory);
+  const list=document.getElementById("studentList");
+  const data=getFiltered();
+  if(!data.length){
+    list.innerHTML='<div class="empty" style="grid-column:1/-1">اس شعبہ میں ابھی کوئی طالب علم موجود نہیں۔<br><br><button class="btn" onclick="openAddStudent(currentCategory===\'all\'?\'\':currentCategory)">+ نیا طالب علم شامل کریں</button></div>';
+    return;
+  }
+  list.innerHTML=data.map(studentCard).join("");
+}
+function studentCard(s){
+  return `<div class="student">
+    <h3>${esc(s.name)}</h3>
+    <div class="meta">
+      <b>والد:</b> ${esc(s.fatherName)}<br>
+      <span class="badge">${esc(s.department)}</span>
+      ${s.className ? " &nbsp; <b>کلاس:</b> "+esc(s.className) : ""}
+    </div>
+    <div class="student-actions">
+      <button onclick="viewStudent('${esc(s.id)}')">👁 دیکھیں</button>
+      <button onclick="editStudent('${esc(s.id)}')">✏ ترمیم</button>
+      <button class="wa" onclick="whatsappStudent('${esc(s.id)}')">WhatsApp</button>
+      <button class="del" onclick="deleteStudent('${esc(s.id)}')">حذف</button>
+    </div>
+  </div>`;
+}
+
+function openAddStudent(dept=""){
+  editingId=null;
+  document.getElementById("studentForm").reset();
+  document.getElementById("editId").value="";
+  document.getElementById("formTitle").textContent="نیا طالب علم شامل کریں";
+  if(dept) document.getElementById("department").value=dept;
+  showSection("form");
+}
+function cancelForm(){
+  if(currentCategory) { renderStudents(); showSection("records"); }
+  else showSection("dashboard");
+}
+function setVal(id,v){document.getElementById(id).value=v||""}
+function editStudent(id){
+  const s=students.find(x=>x.id===id); if(!s)return;
+  editingId=id;
+  document.getElementById("editId").value=id;
+  setVal("name",s.name);setVal("fatherName",s.fatherName);setVal("guardianPhone",s.guardianPhone);
+  setVal("studentPhone",s.studentPhone);setVal("dob",s.dob);setVal("admissionDate",s.admissionDate);
+  setVal("className",s.className);setVal("department",s.department);setVal("address",s.address);
+  setVal("previousInstitute",s.previousInstitute);setVal("guardianProfession",s.guardianProfession);setVal("notes",s.notes);
+  document.getElementById("formTitle").textContent="طالب علم کی معلومات میں ترمیم";
+  showSection("form");
+}
+document.getElementById("studentForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  const old=editingId ? students.find(s=>s.id===editingId) : null;
+  const s={
+    id:editingId || uid(),
+    name:document.getElementById("name").value.trim(),
+    fatherName:document.getElementById("fatherName").value.trim(),
+    guardianPhone:document.getElementById("guardianPhone").value.trim(),
+    studentPhone:document.getElementById("studentPhone").value.trim(),
+    dob:document.getElementById("dob").value,
+    admissionDate:document.getElementById("admissionDate").value,
+    className:document.getElementById("className").value.trim(),
+    department:document.getElementById("department").value,
+    address:document.getElementById("address").value.trim(),
+    previousInstitute:document.getElementById("previousInstitute").value.trim(),
+    guardianProfession:document.getElementById("guardianProfession").value.trim(),
+    notes:document.getElementById("notes").value.trim()
+  };
+  if(!s.name || !s.fatherName || !s.department){ alert("نام، والد کا نام اور شعبہ لازمی ہے۔"); return; }
+  if(old){
+    const index=students.findIndex(x=>x.id===editingId);
+    students[index]=s;
+    currentCategory=s.department;
+    toast("طالب علم کی معلومات اپڈیٹ ہوگئیں۔");
+  }else{
+    students.push(s);
+    currentCategory=s.department;
+    toast("نیا طالب علم کامیابی سے محفوظ ہوگیا۔");
+  }
+  persist();
+  updateCounts();
+  renderStudents();
+  editingId=null;
+  showSection("records");
+});
+
+function deleteStudent(id){
+  const s=students.find(x=>x.id===id); if(!s)return;
+  if(!confirm("کیا آپ واقعی "+s.name+" کا ریکارڈ حذف کرنا چاہتے ہیں؟"))return;
+  students=students.filter(x=>x.id!==id);
+  persist();updateCounts();renderStudents();toast("ریکارڈ حذف ہوگیا۔");
+}
+function viewStudent(id){
+  const s=students.find(x=>x.id===id); if(!s)return;
+  document.getElementById("detailTitle").textContent=s.name;
+  document.getElementById("detailContent").innerHTML=`
+    <div class="detail-grid">
+      ${detail("طالب علم کا نام",s.name)}
+      ${detail("والد کا نام",s.fatherName)}
+      ${detail("شعبہ",s.department)}
+      ${detail("درجہ / کلاس",s.className)}
+      ${detail("والد/سرپرست موبائل",s.guardianPhone)}
+      ${detail("طالب علم موبائل",s.studentPhone)}
+      ${detail("تاریخ پیدائش",s.dob)}
+      ${detail("داخلے کی تاریخ",s.admissionDate)}
+      ${detail("سابقہ مدرسہ / اسکول",s.previousInstitute)}
+      ${detail("سرپرست کا پیشہ",s.guardianProfession)}
+      ${detail("مکمل پتہ",s.address)}
+      ${detail("اضافی معلومات / نوٹ",s.notes)}
+    </div>`;
+  document.getElementById("detailEdit").onclick=()=>{closeModal();editStudent(id)};
+  document.getElementById("detailWhatsApp").onclick=()=>whatsappStudent(id);
+  document.getElementById("detailModal").classList.add("show");
+}
+function detail(label,value){
+  return `<div class="detail"><strong>${esc(label)}</strong>${esc(value)||"—"}</div>`;
+}
+function closeModal(){document.getElementById("detailModal").classList.remove("show")}
+
+function whatsappNumber(num){
+  let n=(num||"").replace(/\D/g,"");
+  if(n.startsWith("03")) n="92"+n.slice(1);
+  if(n.startsWith("0092")) n=n.slice(2);
+  return n;
+}
+function whatsappStudent(id){
+  const s=students.find(x=>x.id===id);if(!s)return;
+  const n=whatsappNumber(s.guardianPhone);
+  if(n.length<10){alert("اس طالب علم کے والد/سرپرست کا درست موبائل نمبر موجود نہیں۔");return}
+  const text=encodeURIComponent("السلام علیکم، "+s.name+" کے طالب علم ریکارڈ کے حوالے سے رابطہ کیا جا رہا ہے۔");
+  window.open("https://wa.me/"+n+"?text="+text,"_blank");
+}
+
+function runSearch(){
+  const q=document.getElementById("searchInput").value.trim().toLowerCase();
+  const box=document.getElementById("searchResults");
+  if(!q){box.innerHTML='<div class="empty">سرچ کے لیے نام، والد کا نام، فون، کلاس یا شعبہ لکھیں۔</div>';return}
+  const data=students.filter(s=>Object.values(s).some(v=>String(v||"").toLowerCase().includes(q)));
+  box.innerHTML=data.length ? `<div class="list">${data.map(studentCard).join("")}</div>` :
+    '<div class="empty">کوئی ریکارڈ نہیں ملا۔</div>';
+}
+function toast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),2200);
+}
+loadData();
+renderStudents();
+</script>
+</body>
+</html>
